@@ -1,0 +1,27 @@
+{
+  "name": "snapassure-soma-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Secure backend for SOMA (SnapAssure's AI assistant) — holds the real AI API key and proxies chat requests to a configurable AI provider.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:test": "node scripts/test-supabase.js",
+    "db:migrate": "node scripts/migrate-to-supabase.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "@supabase/supabase-js": "^2.117.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "nodemailer": "^10.0.12"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}

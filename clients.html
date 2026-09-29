@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Clients &amp; Partners | SnapAssure Interactive Booth</title>
+  <meta name="description"
+    content="Discover the leading brands, celebrated hosts, and luxury weddings that trust SnapAssure for unforgettable interactive photo and video experiences.">
+  <meta name="theme-color" content="#041418">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Our Clients &amp; Partners | SnapAssure">
+  <meta property="og:description"
+    content="Discover the leading brands and celebrated hosts that trust SnapAssure Interactive Booth.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/logos/snapassure-logo.png">
+
+  <link rel="icon" type="image/png" href="assets/logos/snapassure-logo.png">
+  <link rel="preload" as="image" href="assets/logos/snapassure-logo.png" type="image/png" fetchpriority="high">
+
+  <!-- Google Fonts Preconnect & Unified Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css?v=20260929_prod">
+</head>
+
+<body class="clients-page">
+<div class="ambient-orbs" aria-hidden="true"></div>
+  <a href="#clients" class="skip-link">Skip to clients content</a>
+
+  <!-- ============================= HEADER ============================= -->
+  <header class="site-header glass-header" id="siteHeader">
+    <div class="container nav-wrap">
+      <a href="index.html" class="logo" aria-label="SnapAssure Interactive Booth — home">
+        <img src="assets/logos/snapassure-logo.png" alt="SnapAssure Interactive Booth" width="861" height="475"
+          class="logo-img" fetchpriority="high" decoding="async">
+      </a>
+
+      <nav aria-label="Primary navigation" class="desktop-nav">
+        <ul class="nav-links">
+          <li class="nav-indicator" aria-hidden="true"></li>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="experiences.html">Experiences</a></li>
+          <li><a href="clients.html" class="active" aria-current="page">Clients</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Theme Switcher Toggle -->
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="Switch display theme"
+          title="Toggle Light / Dark mode" type="button">
+          <span class="theme-toggle-indicator" aria-hidden="true">
+            <svg class="theme-icon sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="12" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+            <svg class="theme-icon moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          </span>
+          <span class="visually-hidden">Toggle theme</span>
+        </button>
+
+        <!-- SOMA Nav Button -->
+        <button class="soma-nav-btn glass-btn" id="navSomaBtn" aria-haspopup="dialog"
+          aria-label="Open SOMA AI ASSISTANT" type="button">
+          <span class="spark" aria-hidden="true">✦</span> SOMA
+        </button>
+
+        <!-- General Enquiry Header CTA -->
+        <button class="btn btn-quote-nav" id="navQuoteBtn" type="button">
+          GENERAL ENQUIRY
+        </button>
+
+        <!-- Mobile Hamburger Button -->
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false"
+          aria-controls="mobileMenu" type="button">
+          <span class="hamburger-box" aria-hidden="true">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-menu glass-panel" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-menu-inner">
+      <ul class="mobile-nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="experiences.html">Experiences</a></li>
+        <li><a href="clients.html" class="active">Clients</a></li>
+      </ul>
+
+      <div class="mobile-menu-actions">
+        <button class="btn btn-primary w-full" id="mobileQuoteBtn" type="button">
+          General Enquiry
+        </button>
+        <div class="mobile-theme-row">
+          <span class="mobile-theme-label">Theme Mode:</span>
+          <button class="theme-toggle mobile-theme-toggle" id="mobileThemeToggleBtn" type="button"
+            aria-label="Toggle theme">
+            <span class="theme-toggle-indicator" aria-hidden="true">
+              <svg class="theme-icon sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="12" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+              <svg class="theme-icon moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main id="main">
+    <!-- ============================= PAGE HERO ============================= -->
+    <section class="page-hero">
+      <div class="container">
+        <span class="page-hero-tag"><span class="spark" aria-hidden="true">✦</span> Celebrated Partnerships</span>
+        <h1 class="page-hero-title">Our <span>Clients &amp; Partners</span></h1>
+        <p class="page-hero-sub">From high-profile corporate galas and major brand activations to unforgettable luxury weddings, we bring innovation, energy, and seamless execution to every stage.</p>
+      </div>
+    </section>
+
+    <!-- ============================= CLIENTS LOGO WALL & TESTIMONIALS ============================= -->
+    <section class="clients" id="clients" aria-labelledby="clientsHeading">
+      <div class="container">
+        <p class="lede testimonial-line">
+          <span class="testimonial-prompt">Tap here to explore our client stories &amp; reviews:</span>
+          <span id="testimonialsSlot"><a href="https://drive.google.com/drive/folders/1T9vc-Jg-QbOa-dfKAQz3WUXk5Uwxh0_z" target="_blank" rel="noopener" aria-label="Explore client stories and reviews on Google Drive"><img class="badge" src="assets/icons/testimonials-badge.png" alt="Testimonials" width="492" height="118" loading="lazy" decoding="async"></a></span>
+        </p>
+        <h2 id="clientsHeading" class="clients-title">OUR CLIENTS</h2>
+        <ul class="logo-wall" id="logoWall" aria-label="Our clients"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================= FOOTER ============================= -->
+  <footer class="site-footer">
+    <div class="container footer-strip">
+      <div class="footer-contact">
+        <p class="footer-h">GET IN TOUCH</p>
+        <div class="footer-rule" aria-hidden="true"></div>
+        <div class="footer-buttons" role="group" aria-label="SnapAssure contact channels">
+          <a class="footer-btn footer-btn-phone" href="https://wa.me/919601514454" target="_blank" rel="noopener"
+            aria-label="Call or WhatsApp: +91 9601514454">
+            <span class="footer-btn-disc wa" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+            </span>
+            <span class="footer-btn-label">WhatsApp</span>
+          </a>
+
+          <a class="footer-btn footer-btn-social" href="https://www.instagram.com/snapassure" target="_blank"
+            rel="noopener" aria-label="Follow SnapAssure on Instagram">
+            <span class="footer-btn-disc ig" aria-hidden="true">
+              <img src="assets/icons/instagram.svg" alt="" width="18" height="18" loading="lazy" decoding="async">
+            </span>
+            <span class="footer-btn-label">Instagram</span>
+          </a>
+
+          <a class="footer-btn footer-btn-email" href="mailto:snapassure@gmail.com"
+            aria-label="Send email to snapassure@gmail.com">
+            <span class="footer-btn-disc email" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect width="20" height="16" x="2" y="4" rx="2" />
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+            </span>
+            <span class="footer-btn-label">Email</span>
+          </a>
+        </div>
+      </div>
+      <a href="index.html" class="footer-logo" aria-label="SnapAssure Home"><img src="assets/logos/snapassure-logo-footer.png"
+          alt="SnapAssure Interactive Booth" width="431" height="238" loading="lazy" decoding="async"></a>
+    </div>
+    <p class="footer-copy">© <span id="year"></span> SnapAssure Interactive Booth. All rights reserved.</p>
+  </footer>
+
+  <!-- ============================= REUSABLE ENQUIRY / QUOTE MODAL ============================= -->
+  <div class="enquiry-modal-backdrop" id="enquiryModal" role="dialog" aria-modal="true" aria-labelledby="modalFormTitle"
+    hidden>
+    <div class="enquiry-modal-dialog glass-modal">
+      <button type="button" class="modal-close-btn" id="modalCloseBtn" aria-label="Close enquiry form">✕</button>
+
+      <div class="modal-form-header">
+        <div class="modal-badge" id="modalBadge">REQUEST A QUOTE</div>
+        <h2 id="modalFormTitle" class="modal-title">Request a Quote</h2>
+        <p class="modal-subtitle" id="modalSubtitle">Share your event requirements for a detailed, customized interactive booth quote.</p>
+
+        <div class="form-tabs modal-tabs" role="tablist" aria-label="Form mode selection">
+          <button type="button" class="form-tab modal-tab" id="modalTabEnquiry" role="tab" aria-selected="false"
+            data-mode="enquiry">General Enquiry</button>
+          <button type="button" class="form-tab modal-tab" id="modalTabQuote" role="tab" aria-selected="true"
+            data-mode="quote">Request a Quote</button>
+        </div>
+      </div>
+
+      <!-- Modal Form Body -->
+      <form id="modalEnquiryForm" novalidate>
+        <div class="form-grid">
+          <div class="field full">
+            <label for="mName">Full Name <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="mName" name="name" required autocomplete="name" placeholder="e.g. Arnav Sharma">
+            <p class="error-msg" id="mNameError">Please enter your full name.</p>
+          </div>
+
+          <div class="field">
+            <label for="mPhone">Phone Number <span class="req" aria-hidden="true">*</span></label>
+            <input type="tel" id="mPhone" name="phone" required inputmode="tel" autocomplete="tel"
+              placeholder="+91 96015 14454">
+            <p class="error-msg" id="mPhoneError">Please enter a valid phone number.</p>
+          </div>
+
+          <div class="field">
+            <label for="mEmail">Email Address <span class="req" aria-hidden="true">*</span></label>
+            <input type="email" id="mEmail" name="email" required inputmode="email" autocomplete="email"
+              placeholder="name@domain.com">
+            <p class="error-msg" id="mEmailError">Please enter a valid email address.</p>
+          </div>
+
+          <div class="field">
+            <label for="mEventType">Event Type</label>
+            <select id="mEventType" name="eventType">
+              <option value="">Select event type…</option>
+              <option value="Wedding">Wedding</option>
+              <option value="Corporate Event">Corporate Event</option>
+              <option value="Birthday">Birthday</option>
+              <option value="Private Party">Private Party</option>
+              <option value="Brand Activation">Brand Activation</option>
+              <option value="Exhibition">Exhibition</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="mEventDate">Event Date</label>
+            <input type="date" id="mEventDate" name="eventDate">
+          </div>
+
+          <div class="field">
+            <label for="mCity">City / Location</label>
+            <input type="text" id="mCity" name="city" placeholder="e.g. Ahmedabad, Mumbai, Udaipur…">
+          </div>
+
+          <div class="field">
+            <label for="mGuests">Number of Guests</label>
+            <input type="number" id="mGuests" name="guests" min="1" placeholder="e.g. 250">
+          </div>
+
+          <div class="field full">
+            <label for="mExperience">Interested Experience</label>
+            <select id="mExperience" name="experience">
+              <option value="">Select an experience (optional)</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label for="mMessage">Message / Requirements</label>
+            <textarea id="mMessage" name="message" rows="3"
+              placeholder="Tell us more about your event theme, custom branding, or specific requirements…"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="modalSubmitBtn">
+            <span class="btn-text" id="modalSubmitText">Request Custom Quote</span>
+            <span class="btn-spinner" aria-hidden="true" hidden></span>
+          </button>
+          <button type="button" class="btn btn-whatsapp" id="modalWaBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            Send on WhatsApp
+          </button>
+        </div>
+
+        <div class="form-feedback-error" id="modalFormError" role="alert" hidden>
+          Please fix the highlighted fields above.
+        </div>
+      </form>
+
+      <!-- Modal Loading View -->
+      <div class="modal-state-view loading-view glass-card" id="modalLoadingView" hidden>
+        <div class="state-spinner" aria-hidden="true"></div>
+        <h3>Sending your details…</h3>
+        <p>Connecting with SnapAssure event specialists…</p>
+      </div>
+
+      <!-- Modal Success View -->
+      <div class="modal-state-view success-view glass-card" id="modalSuccessView" role="status" aria-live="polite" hidden>
+        <div class="success-icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <h3 id="modalSuccessTitle">Thank you! Your enquiry has been received.</h3>
+        <p id="modalSuccessBody">The SnapAssure team will get back to you shortly.</p>
+        <div class="success-actions">
+          <button type="button" class="btn btn-whatsapp" id="successWaBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            Send copy on WhatsApp
+          </button>
+          <button type="button" class="btn btn-outline" id="modalDoneBtn">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= SOMA AI ASSISTANT ============================= -->
+  <button class="soma-launcher glass-btn" id="somaLauncher" aria-haspopup="dialog" aria-controls="somaPanel"
+    aria-label="Open SOMA AI ASSISTANT" type="button">
+    <span class="orb-mini" aria-hidden="true"></span>
+    <span class="soma-launcher-text">SOMA</span>
+  </button>
+
+  <div class="soma-panel glass-panel" id="somaPanel" role="dialog" aria-modal="false" aria-labelledby="somaPanelTitle">
+    <div class="soma-drag-handle" aria-hidden="true"></div>
+    <div class="soma-header">
+      <div class="soma-avatar" id="somaHeaderAvatar" aria-hidden="true"></div>
+      <div class="soma-title-wrap">
+        <div class="soma-title-row">
+          <strong id="somaPanelTitle">SOMA</strong>
+          <div class="soma-status-badge idle" id="somaStatusBadge">
+            <span class="status-pulse" aria-hidden="true"></span>
+            <span class="status-text" id="somaStatusText">IDLE</span>
+          </div>
+        </div>
+        <span class="soma-sub">SnapAssure's AI Assistant</span>
+      </div>
+      <div class="soma-header-actions">
+        <button id="somaInfoBtn" aria-label="About SOMA" title="About SOMA" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+        </button>
+        <button id="somaClearBtn" aria-label="Clear conversation" title="Clear conversation" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        </button>
+        <button id="somaMinimizeBtn" aria-label="Minimize SOMA" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="soma-error-banner" id="somaErrorBanner"></div>
+
+    <!-- SOMA "About SOMA" role info panel -->
+    <div class="soma-info-view" id="somaInfoView" hidden>
+      <button class="soma-info-back" id="somaInfoBackBtn" type="button">← Back to chat</button>
+      <h3 id="somaInfoTitle">Meet SOMA — Your Event Concierge</h3>
+      <p class="soma-info-lede">SOMA is SnapAssure's dedicated AI assistant, crafted to help you discover, plan, and book unforgettable interactive photo and video experiences for your special celebrations.</p>
+
+      <h4>What SOMA Can Do For You</h4>
+      <p class="soma-info-caption">Your 24/7 personal guide for events & celebrations:</p>
+      <ul>
+        <li><strong>Curated Recommendations:</strong> Tell SOMA your event type — wedding, corporate summit, brand activation, birthday, or college fest — and get tailored booth suggestions for your vibe and guest count.</li>
+        <li><strong>Explore 44+ Experiences:</strong> Learn about 360 Spinners, Glam Robot Cams, Vintage Mirror Booths, AI Morphing, Slow-Mo Tunnels, and more.</li>
+        <li><strong>Inclusions & Space Requirements:</strong> Get instant answers on venue dimensions, backdrop options, custom branding, instant printouts, and digital sharing.</li>
+        <li><strong>Catalogue & Site Navigation:</strong> SOMA can navigate the website with you, filter booths by category, and highlight live client showcases.</li>
+        <li><strong>Quick Enquiry Assistance:</strong> Ready for a quote? SOMA gathers your key event details so our production team can send you a personalized proposal right away.</li>
+        <li><strong>Creative Brainstorming & Everyday Chat:</strong> Need photo booth theme concepts, wedding hashtag ideas, or answers to general questions? SOMA is always ready to talk.</li>
+      </ul>
+
+      <h4>How to Interact</h4>
+      <ul>
+        <li><strong>Type or Speak:</strong> Chat by typing or tap the microphone icon anytime to talk hands-free.</li>
+        <li><strong>Natural Questions:</strong> Ask naturally, such as <em>"What booth is best for an outdoor cocktail party?"</em> or <em>"Show me experiences with instant prints."</em></li>
+      </ul>
+
+      <p class="soma-info-footnote">Ready to elevate your next celebration? Click <strong>← Back to chat</strong> and start planning with SOMA!</p>
+    </div>
+
+    <div class="soma-messages" id="somaMessages" aria-live="polite"></div>
+
+    <div class="soma-input-row">
+      <button class="soma-icon-btn mic" id="somaMicBtn" aria-label="Speak to SOMA" type="button" title="Speak to SOMA">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          aria-hidden="true">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+          <line x1="12" y1="19" x2="12" y2="23" />
+        </svg>
+      </button>
+      <label for="somaTextInput" class="visually-hidden">Message SOMA</label>
+      <textarea id="somaTextInput" rows="1" placeholder="Ask SOMA about an experience…"></textarea>
+      <button class="soma-icon-btn" id="somaStopSpeakBtn" aria-label="Stop SOMA speaking" type="button" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <rect x="6" y="6" width="12" height="12" />
+        </svg>
+      </button>
+      <button class="soma-icon-btn send" id="somaSendBtn" aria-label="Send message" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          aria-hidden="true">
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================= VOICE OVERLAY (Siri-style) ============================= -->
+  <div class="voice-overlay" id="voiceOverlay" role="dialog" aria-modal="true" aria-label="SOMA voice assistant">
+    <button class="voice-close" id="voiceCloseBtn" aria-label="Close voice assistant" type="button">✕</button>
+    <div class="voice-orb-wrap">
+      <div class="voice-ring r1" aria-hidden="true"></div>
+      <div class="voice-ring r2" aria-hidden="true"></div>
+      <div class="voice-ring r3" aria-hidden="true"></div>
+      <div class="voice-orb" id="voiceOrb"></div>
+    </div>
+    <p class="voice-state-label" id="voiceStateLabel">Say something…</p>
+    <p class="voice-transcript" id="voiceTranscript"></p>
+    <p class="voice-fallback-note" id="voiceFallbackNote" hidden></p>
+    <p class="voice-hint">Tap the orb or press Space to stop listening</p>
+  </div>
+
+  <!-- Scripts with defer to prevent render blocking -->
+  <script defer src="js/experiences-data.js?v=20260929_prod"></script>
+  <script defer src="js/soma-config.js?v=20260929_prod"></script>
+  <script defer src="js/ai-agent.js?v=20260929_prod"></script>
+  <script defer src="js/voice-agent.js?v=20260929_prod"></script>
+  <script defer src="js/script.js?v=20260929_prod"></script>
+</body>
+
+</html>
