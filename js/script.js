@@ -874,7 +874,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       this.isSubmitting = true;
       const data = this.getFormData(scope);
-      const endpoint = (window.SOMA_CONFIG && window.SOMA_CONFIG.enquiryUrl) || "http://localhost:3000/api/enquiry";
+
+      const isHttps = typeof window !== "undefined" && window.location.protocol === "https:";
+      let endpoint = (window.SOMA_CONFIG && window.SOMA_CONFIG.enquiryUrl) || (isHttps ? "/api/enquiry" : "http://localhost:3000/api/enquiry");
+      if (isHttps && endpoint.startsWith("http://localhost")) {
+        endpoint = "/api/enquiry";
+      }
 
       let btn = null;
       let spinner = null;
@@ -898,9 +903,10 @@ document.addEventListener("DOMContentLoaded", () => {
       let result = null;
       let networkError = null;
 
+      // 1. Try server endpoint (/api/enquiry)
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
         const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -916,8 +922,57 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(errData.error || `Server returned status ${res.status}`);
         }
       } catch (err) {
-        console.warn("[Enquiry] Could not reach backend enquiry service:", err.message);
+        console.warn("[Enquiry] Primary enquiry endpoint unavailable:", err.message);
         networkError = err;
+      }
+
+      // 2. Direct Supabase REST fallback (works directly on static Netlify host)
+      if (!result || !result.saved) {
+        try {
+          const sbUrl = (window.SOMA_CONFIG && window.SOMA_CONFIG.supabaseUrl) || "https://jqipqlbounvqtfenuyhd.supabase.co";
+          const sbKey = (window.SOMA_CONFIG && window.SOMA_CONFIG.supabaseAnonKey) || "sb_publishable_1kW-2FWNjqkodkFEEV3g1Q_1vqGM9Kc";
+          if (sbUrl && sbKey) {
+            const row = {
+              id: `enq_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+              name: String(data.name || "").trim(),
+              email: String(data.email || "").trim(),
+              phone: String(data.phone || "").trim(),
+              subject: data.mode === "quote" ? "Request a Quote" : "General Enquiry",
+              mode: data.mode || "enquiry",
+              event_type: data.eventType || null,
+              event_date: data.eventDate || null,
+              city: data.city || null,
+              guests: data.guests != null ? String(data.guests) : null,
+              experience: data.experience || null,
+              message: data.message || null,
+              email_status: "pending_direct",
+              submitted_at: new Date().toISOString(),
+              formatted_date: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) + " IST"
+            };
+
+            const sbRes = await fetch(`${sbUrl}/rest/v1/enquiries`, {
+              method: "POST",
+              headers: {
+                "apikey": sbKey,
+                "Authorization": `Bearer ${sbKey}`,
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+              },
+              body: JSON.stringify(row)
+            });
+
+            if (sbRes.ok) {
+              result = {
+                saved: true,
+                emailSent: false,
+                id: row.id,
+                message: "Thank you! Your enquiry has been safely received."
+              };
+            }
+          }
+        } catch (sbErr) {
+          console.warn("[Enquiry] Direct Supabase fallback warning:", sbErr.message);
+        }
       }
 
       // Check results

@@ -4,6 +4,28 @@
 
 [build]
   publish = "."
+  functions = "netlify/functions"
+
+# Serverless function routing
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/chat"
+  status = 200
+
+[[redirects]]
+  from = "/api/enquiry"
+  to = "/.netlify/functions/enquiry"
+  status = 200
+
+[[redirects]]
+  from = "/api/enquiries"
+  to = "/.netlify/functions/enquiry"
+  status = 200
+
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
 
 # Production caching and security headers
 [[headers]]

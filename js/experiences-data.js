@@ -2110,9 +2110,20 @@ const EXPERIENCES = [
 // Quick lookup map used by the AI action layer (openExperience, etc.)
 const EXPERIENCES_BY_ID = Object.fromEntries(EXPERIENCES.map(e => [e.id, e]));
 
-// Combined knowledge base object handed to SOMA (see ai-agent.js)
 const snapAssureKnowledge = {
   company: COMPANY_INFO,
   categories: CATEGORIES.filter(c => c !== "All"),
   experiences: EXPERIENCES
 };
+
+if (typeof window !== "undefined") {
+  window.COMPANY_INFO = COMPANY_INFO;
+  window.CATEGORIES = CATEGORIES;
+  window.EXPERIENCES = EXPERIENCES;
+  window.EXPERIENCES_BY_ID = EXPERIENCES_BY_ID;
+  window.snapAssureKnowledge = snapAssureKnowledge;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { COMPANY_INFO, CATEGORIES, EXPERIENCES, EXPERIENCES_BY_ID, snapAssureKnowledge };
+}

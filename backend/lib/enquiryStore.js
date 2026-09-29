@@ -23,11 +23,15 @@ const ENQUIRIES_FILE = path.join(DATA_DIR, "enquiries.json");
 const recentSubmissions = new Map();
 
 function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-  if (!fs.existsSync(ENQUIRIES_FILE)) {
-    fs.writeFileSync(ENQUIRIES_FILE, JSON.stringify([], null, 2), "utf8");
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(ENQUIRIES_FILE)) {
+      fs.writeFileSync(ENQUIRIES_FILE, JSON.stringify([], null, 2), "utf8");
+    }
+  } catch (err) {
+    // Read-only filesystem in serverless runtime (Netlify Functions / Lambda)
   }
 }
 

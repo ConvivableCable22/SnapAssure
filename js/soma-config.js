@@ -1,23 +1,30 @@
 /* ============================================================
-   leo — Public runtime config
+   SOMA — Public Runtime Config
    ------------------------------------------------------------
-   Safe to ship to the browser: it contains NO secrets, just a
-   flag and a URL. The real AI API key lives only on the backend
-   server (see /backend/.env.example), read from environment
-   variables — never here, never in any frontend file.
-
-   To go live with a real AI backend:
-     1. Deploy /backend (see backend/README section in the
-        project README) with AI_PROVIDER / AI_API_KEY / AI_MODEL
-        set as environment variables on the server.
-     2. Set useRealBackend to true and point backendUrl at your
-        deployed backend's /api/chat endpoint.
-   No other file needs to change — ai-agent.js reads this object
-   at call time.
+   Safe to ship to the browser: contains NO secret keys.
+   Automatically detects local development vs. production (Netlify).
    ============================================================ */
 
-window.SOMA_CONFIG = {
-  useRealBackend: true,                            // Set to true when running node backend on port 3000
-  backendUrl: "http://localhost:3000/api/chat",    // Local backend server AI endpoint
-  enquiryUrl: "http://localhost:3000/api/enquiry"  // Local backend server Enquiry submission endpoint
-};
+(function () {
+  const isLocal = typeof window !== "undefined" && window.location && (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname === ""
+  );
+
+  // In local development: talks to local Node backend on port 3000
+  // On Netlify / Production: uses same-origin relative endpoints (/api/chat, /api/enquiry)
+  // which route directly to Netlify Functions without mixed-content browser blocks.
+  const defaultBackend = isLocal ? "http://localhost:3000/api/chat" : "/api/chat";
+  const defaultEnquiry = isLocal ? "http://localhost:3000/api/enquiry" : "/api/enquiry";
+
+  window.SOMA_CONFIG = {
+    useRealBackend: true,
+    backendUrl: (typeof window !== "undefined" && window.SOMA_CUSTOM_BACKEND_URL) || defaultBackend,
+    enquiryUrl: (typeof window !== "undefined" && window.SOMA_CUSTOM_ENQUIRY_URL) || defaultEnquiry,
+    isLocal: isLocal,
+    // Public Supabase project details for direct frontend resilience fallback
+    supabaseUrl: "https://jqipqlbounvqtfenuyhd.supabase.co",
+    supabaseAnonKey: "sb_publishable_1kW-2FWNjqkodkFEEV3g1Q_1vqGM9Kc"
+  };
+})();

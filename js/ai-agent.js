@@ -107,6 +107,8 @@ const SomaMemory = {
 // A real backend mirrors this same idea server-side, in
 // backend/lib/context.js, before calling the AI provider.
 // ------------------------------------------------------------
+var EXPERIENCES = (typeof EXPERIENCES !== "undefined" ? EXPERIENCES : (typeof window !== "undefined" && window.EXPERIENCES ? window.EXPERIENCES : (typeof global !== "undefined" && global.EXPERIENCES ? global.EXPERIENCES : [])));
+
 function retrieveExperiences(query, { limit = 6 } = {}) {
   const STOP_WORDS = new Set(["hi", "hello", "hey", "the", "a", "an", "is", "in", "it", "to", "for", "of", "and", "or", "me", "my", "we", "our", "you", "your", "can", "show", "what", "find", "get", "do", "how", "tell"]);
   const rawWords = (query || "").toLowerCase().split(/\s+/).map(w => w.replace(/[^a-z0-9]/g, "")).filter(Boolean);
@@ -668,15 +670,22 @@ function mockAI(userText, memory) {
 // whole app works with zero server setup out of the box.
 // ------------------------------------------------------------
 async function callAIBackend(message, memory) {
-  const cfg = (typeof window !== "undefined" && window.SOMA_CONFIG) || (typeof SOMA_CONFIG !== "undefined" ? SOMA_CONFIG : { useRealBackend: false, backendUrl: "http://localhost:3000/api/chat" });
+  const cfg = (typeof window !== "undefined" && window.SOMA_CONFIG) || (typeof SOMA_CONFIG !== "undefined" ? SOMA_CONFIG : { useRealBackend: false, backendUrl: "/api/chat" });
   memory = memory || (typeof SomaMemory !== "undefined" ? SomaMemory : {});
   if (!memory.slots) memory.slots = { eventType: null, guests: null, preference: null, indoorOutdoor: null };
   if (!memory.history) memory.history = [];
 
-  if (cfg.useRealBackend) {
+  const isHttps = typeof window !== "undefined" && window.location && window.location.protocol === "https:";
+  const isHttpLocalhost = typeof cfg.backendUrl === "string" && cfg.backendUrl.startsWith("http://localhost");
+
+  // Prevent browser Mixed Content security blocking (HTTPS page calling http://localhost)
+  const shouldSkipBackend = isHttps && isHttpLocalhost;
+
+  if (cfg.useRealBackend && !shouldSkipBackend && cfg.backendUrl) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      // Fast 5000ms timeout prevents user waiting on frozen screen if serverless is cold or offline
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
       const res = await fetch(cfg.backendUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -689,16 +698,19 @@ async function callAIBackend(message, memory) {
       });
       clearTimeout(timeoutId);
       if (res.ok) {
-        return await res.json(); // { reply, action }
+        const json = await res.json();
+        if (json && typeof json.reply === "string" && json.reply.trim()) {
+          return json; // { reply, action }
+        }
       }
-      console.warn("[SOMA] Backend returned status " + res.status + ", falling back to local knowledge.");
+      console.warn("[SOMA] Backend returned status " + res.status + ", falling back to built-in knowledge.");
     } catch (err) {
-      console.warn("[SOMA] Backend server unreachable at " + cfg.backendUrl + ". Falling back to local assistant.", err.message);
+      console.warn("[SOMA] Backend unreachable (" + err.message + "). Falling back to local assistant.");
     }
   }
 
   // Fallback / local assistant mode with fast natural typing simulation
-  await new Promise(r => setTimeout(r, 100 + Math.random() * 120));
+  await new Promise(r => setTimeout(r, 60 + Math.random() * 80));
   return mockAI(message, memory);
 }
 
@@ -733,3 +745,15 @@ function executeSomaAction(action) {
       break;
   }
 }
+
+if (typeof window !== "undefined") {
+  window.callAIBackend = callAIBackend;
+  window.SomaMemory = SomaMemory;
+  window.mockAI = mockAI;
+  window.executeSomaAction = executeSomaAction;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { callAIBackend, mockAI, SomaMemory, executeSomaAction };
+}
+
