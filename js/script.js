@@ -2036,19 +2036,35 @@ document.addEventListener("DOMContentLoaded", () => {
     if (somaStatusText) somaStatusText.textContent = stateName.toUpperCase();
   }
 
-  function openSomaPanel() {
-    if (!somaPanel) return;
-    somaPanel.classList.add("open");
-    if (somaLauncher) somaLauncher.classList.add("hidden");
-    if (somaMessages && !somaMessages.children.length) renderGreeting();
-    if (somaTextInput) somaTextInput.focus();
+  function openSomaPanel(e) {
+    if (e && typeof e.preventDefault === "function") e.preventDefault();
+    const panel = $("somaPanel") || document.getElementById("somaPanel");
+    const launcher = $("somaLauncher") || document.getElementById("somaLauncher");
+    if (!panel) return;
+    panel.classList.add("open");
+    panel.style.display = "flex";
+    if (launcher) launcher.classList.add("hidden");
+    try {
+      const msgs = $("somaMessages") || document.getElementById("somaMessages");
+      if (msgs && !msgs.children.length) renderGreeting();
+    } catch (err) {
+      console.warn("[SOMA] Error rendering greeting:", err);
+    }
+    const input = $("somaTextInput") || document.getElementById("somaTextInput");
+    if (input) {
+      setTimeout(() => input.focus(), 60);
+    }
     setSomaState("idle");
   }
 
-  function closeSomaPanel() {
-    if (!somaPanel) return;
-    somaPanel.classList.remove("open");
-    if (somaLauncher) somaLauncher.classList.remove("hidden");
+  function closeSomaPanel(e) {
+    if (e && typeof e.preventDefault === "function") e.preventDefault();
+    const panel = $("somaPanel") || document.getElementById("somaPanel");
+    const launcher = $("somaLauncher") || document.getElementById("somaLauncher");
+    if (!panel) return;
+    panel.classList.remove("open");
+    panel.style.display = "";
+    if (launcher) launcher.classList.remove("hidden");
     if (typeof VoiceAgent !== "undefined" && VoiceAgent.stopSpeaking) {
       VoiceAgent.stopSpeaking();
     }
@@ -2068,8 +2084,25 @@ document.addEventListener("DOMContentLoaded", () => {
   if (heroChatBtn) heroChatBtn.addEventListener("click", openSomaPanel);
   if (somaMinimizeBtn) somaMinimizeBtn.addEventListener("click", closeSomaPanel);
 
+  // Global click delegation ensures SOMA triggers work even after page transitions
+  document.addEventListener("click", (e) => {
+    const somaTrigger = e.target.closest("#somaLauncher, #navSomaBtn, #heroChatBtn, .hero-chat-cta, .soma-nav-btn, [data-open-soma]");
+    if (somaTrigger) {
+      e.preventDefault();
+      openSomaPanel(e);
+      return;
+    }
+    const somaClose = e.target.closest("#somaMinimizeBtn");
+    if (somaClose) {
+      e.preventDefault();
+      closeSomaPanel(e);
+      return;
+    }
+  });
+
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && somaPanel && somaPanel.classList.contains("open")) {
+    const panel = $("somaPanel") || document.getElementById("somaPanel");
+    if (e.key === "Escape" && panel && panel.classList.contains("open")) {
       closeSomaPanel();
     }
   });
@@ -2160,9 +2193,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function appendSuggestedPrompts() {
+    const msgs = $("somaMessages") || document.getElementById("somaMessages");
+    if (!msgs) return;
+    const prompts = (typeof window !== "undefined" && window.SOMA_SUGGESTED_PROMPTS) ||
+      (typeof SOMA_SUGGESTED_PROMPTS !== "undefined" ? SOMA_SUGGESTED_PROMPTS : [
+        "Show me wedding experiences",
+        "What is your AI photobooth?",
+        "Which booths work for corporate events?",
+        "Tell me about the 360 Video Booth",
+        "Help me choose an experience"
+      ]);
     const chipsRow = document.createElement("div");
     chipsRow.className = "msg-suggestions";
-    SOMA_SUGGESTED_PROMPTS.forEach((prompt) => {
+    prompts.forEach((prompt) => {
       const chip = document.createElement("button");
       chip.type = "button";
       chip.className = "suggestion-chip";
@@ -2170,11 +2213,13 @@ document.addEventListener("DOMContentLoaded", () => {
       chip.addEventListener("click", () => sendSomaMessage(prompt));
       chipsRow.appendChild(chip);
     });
-    somaMessages.appendChild(chipsRow);
+    msgs.appendChild(chipsRow);
   }
 
   function renderGreeting() {
-    appendMessage("soma", SOMA_GREETING);
+    const greetingText = (typeof window !== "undefined" && window.SOMA_GREETING) ||
+      (typeof SOMA_GREETING !== "undefined" ? SOMA_GREETING : "Hi, I'm SOMA — SnapAssure's AI assistant. Tell me about your event, and I'll help you discover the right experience.");
+    appendMessage("soma", greetingText);
     appendSuggestedPrompts();
   }
 

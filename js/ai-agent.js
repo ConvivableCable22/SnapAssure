@@ -747,6 +747,10 @@ function executeSomaAction(action) {
 }
 
 if (typeof window !== "undefined") {
+  window.SOMA_GREETING = SOMA_GREETING;
+  window.SOMA_SUGGESTED_PROMPTS = SOMA_SUGGESTED_PROMPTS;
+  window.SOMA_ROLE_INFO = SOMA_ROLE_INFO;
+  window.retrieveExperiences = retrieveExperiences;
   window.callAIBackend = callAIBackend;
   window.SomaMemory = SomaMemory;
   window.mockAI = mockAI;
@@ -754,6 +758,15 @@ if (typeof window !== "undefined") {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { callAIBackend, mockAI, SomaMemory, executeSomaAction };
+  module.exports = {
+    SOMA_GREETING,
+    SOMA_SUGGESTED_PROMPTS,
+    SOMA_ROLE_INFO,
+    retrieveExperiences,
+    callAIBackend,
+    mockAI,
+    SomaMemory,
+    executeSomaAction
+  };
 }
 
