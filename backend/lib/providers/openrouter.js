@@ -25,7 +25,7 @@ function createOpenRouterProvider({ apiKey, model }) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": "http://localhost:5500",
+        "HTTP-Referer": process.env.URL || process.env.SITE_URL || "https://snapassure.com",
         "X-Title": "SnapAssure SOMA AI"
       },
       signal: AbortSignal.timeout(7000),
