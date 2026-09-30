@@ -22,9 +22,6 @@
     useRealBackend: true,
     backendUrl: (typeof window !== "undefined" && window.SOMA_CUSTOM_BACKEND_URL) || defaultBackend,
     enquiryUrl: (typeof window !== "undefined" && window.SOMA_CUSTOM_ENQUIRY_URL) || defaultEnquiry,
-    isLocal: isLocal,
-    // Public Supabase project details for direct frontend resilience fallback
-    supabaseUrl: "https://jqipqlbounvqtfenuyhd.supabase.co",
-    supabaseAnonKey: "sb_publishable_1kW-2FWNjqkodkFEEV3g1Q_1vqGM9Kc"
+    isLocal: isLocal
   };
 })();

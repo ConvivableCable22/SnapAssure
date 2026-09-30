@@ -929,8 +929,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // 2. Direct Supabase REST fallback (works directly on static Netlify host)
       if (!result || !result.saved) {
         try {
-          const sbUrl = (window.SOMA_CONFIG && window.SOMA_CONFIG.supabaseUrl) || "https://jqipqlbounvqtfenuyhd.supabase.co";
-          const sbKey = (window.SOMA_CONFIG && window.SOMA_CONFIG.supabaseAnonKey) || "sb_publishable_1kW-2FWNjqkodkFEEV3g1Q_1vqGM9Kc";
+          const sbUrl = window.SOMA_CONFIG && window.SOMA_CONFIG.supabaseUrl;
+          const sbKey = window.SOMA_CONFIG && window.SOMA_CONFIG.supabaseAnonKey;
           if (sbUrl && sbKey) {
             const row = {
               id: `enq_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
