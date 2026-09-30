@@ -2566,24 +2566,39 @@ body.experiences-page .toolbar-wrap {
   transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
+.exp-card-media picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
 .exp-card-media-main {
   position: relative;
   z-index: 1;
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
   object-fit: contain;
-  padding: 16px 18px;
+  padding: 24px 14px 10px;
   box-sizing: border-box;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
-  transition: transform 0.35s var(--ease-smooth);
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45));
+  transition: transform 0.35s var(--ease-smooth), filter 0.35s ease;
 }
 
 .exp-card:hover .exp-card-media-main {
-  transform: scale(1.05);
+  transform: scale(1.02);
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6));
 }
 
 .exp-card:hover .exp-card-media-bg {
-  transform: scale(1.08);
+  transform: scale(1.05);
   opacity: 0.72;
 }
 
@@ -3580,25 +3595,40 @@ body.modal-open {
   border: none;
   padding: 0;
   cursor: zoom-in;
+  overflow: visible;
+}
+
+.exp-modal-body .shot picture,
+.exp-modal-body .shot-btn picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 .exp-modal-body .shot img {
-  max-height: 100%;
-  max-width: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
+  max-height: 100% !important;
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
   border-radius: 12px;
   box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.12);
   display: block;
+  margin: auto;
 }
 
 .exp-modal-body .gallery[data-orientation="landscape"] .shot img {
-  max-height: 100%;
-  max-width: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
+  max-height: 100% !important;
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
 }
 
 .exp-modal-body .gallery[data-count="2"] .gallery-track {
@@ -3632,11 +3662,11 @@ body.modal-open {
 }
 
 .exp-modal-body .gallery[data-count="2"] .shot img {
-  max-height: 100%;
-  max-width: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
+  max-height: 100% !important;
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
 }
 
 .exp-modal-body .gallery-card-footer {
@@ -3836,32 +3866,46 @@ body.modal-open {
   background: none;
   cursor: zoom-in;
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow: visible;
+}
+
+.shot picture,
+.shot-btn picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 /* Single photos: Centered, prominent, high-resolution with shadow */
 .shot img {
   display: block;
-  max-height: 100%;
-  max-width: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
+  max-height: 100% !important;
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
   border-radius: var(--radius-md);
   box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.12);
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, filter 0.25s ease;
+  margin: auto;
 }
 
 .gallery[data-orientation="landscape"] .shot img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
 }
 
 .shot-btn:hover img {
-  transform: scale(1.025);
+  filter: brightness(1.04);
 }
 
 /* Two-photo experiences: 2-column side-by-side inside the showcase card */
@@ -3885,9 +3929,11 @@ body.modal-open {
   }
 
   .gallery[data-count="2"] .shot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
     border-radius: var(--radius-md);
   }
 }
@@ -6422,9 +6468,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
 
   .gallery[data-count="2"] .shot img {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
+    height: auto !important;
+    width: auto !important;
+    max-height: 100% !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+    margin: auto;
   }
 
   /* Native Mobile SOMA Bottom Sheet */
@@ -6643,9 +6692,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
   .exp-modal-body .gallery {
     order: -1;
-    height: clamp(130px, 22vh, 175px);
-    min-height: 120px;
-    padding: 4px 8px;
+    height: clamp(190px, 32vh, 260px);
+    min-height: 170px;
+    padding: 6px 8px;
     flex: 0 0 auto;
   }
   .exp-modal-body .gallery-card-header {
@@ -6665,8 +6714,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   .exp-modal-body .sheet-text {
     flex: 1 1 auto;
     min-height: 0;
-    gap: 2px;
-    overflow: hidden;
+    gap: 3px;
+    overflow-y: auto;
   }
   .exp-modal-body .sheet-header-group {
     gap: 2px;
