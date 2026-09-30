@@ -164,11 +164,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function normalizePagePath(path) {
+    if (!path) return "index.html";
+    let clean = path.split("#")[0].split("?")[0].trim();
+    try {
+      if (clean.startsWith("http://") || clean.startsWith("https://")) {
+        clean = new URL(clean).pathname;
+      }
+    } catch (e) {}
+    clean = clean.replace(/^\/+|\/+$/g, "");
+    clean = clean.split("/").pop() || "index.html";
+    if (!clean || clean === "." || clean === "index") return "index.html";
+    if (clean === "experiences") return "experiences.html";
+    if (clean === "clients") return "clients.html";
+    if (!clean.endsWith(".html")) clean += ".html";
+    return clean.toLowerCase();
+  }
+
   function reinitPageFeatures() {
     initLogoWall();
     populateExperienceDropdowns();
     if (typeof initExperiencesPage === "function") {
       initExperiencesPage();
+    }
+    if (typeof ExperienceModalController !== "undefined" && ExperienceModalController.init) {
+      ExperienceModalController.init();
+    }
+    if (typeof CategoryDrawerController !== "undefined" && CategoryDrawerController.init) {
+      CategoryDrawerController.init();
+    }
+    if (typeof initLightbox === "function") {
+      initLightbox();
     }
     if (typeof UnifiedEnquiryController !== "undefined" && UnifiedEnquiryController && typeof UnifiedEnquiryController.initInpageForm === "function") {
       UnifiedEnquiryController.initInpageForm();
@@ -210,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }, { passive: true });
 
       window.addEventListener("popstate", () => {
-        const href = window.location.pathname.split("/").pop() || "index.html";
+        const href = normalizePagePath(window.location.pathname);
         this.navigate(href + window.location.hash, false);
       });
 
@@ -224,8 +250,8 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        const cleanPath = href.split("#")[0].split("?")[0];
-        if (!["index.html", "experiences.html", "clients.html", ""].includes(cleanPath)) {
+        const cleanPath = normalizePagePath(href);
+        if (!["index.html", "experiences.html", "clients.html"].includes(cleanPath)) {
           return;
         }
 
@@ -240,8 +266,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const link = e.target.closest("a");
         if (!link) return;
         const href = link.getAttribute("href");
-        if (href && ["index.html", "experiences.html", "clients.html"].includes(href.split("#")[0].split("?")[0])) {
-          this.prefetch(href);
+        if (!href || href.startsWith("#") || href.startsWith("http") || href.startsWith("mailto:") || href.startsWith("tel:") || link.target === "_blank") {
+          return;
+        }
+        const cleanPath = normalizePagePath(href);
+        if (["index.html", "experiences.html", "clients.html"].includes(cleanPath)) {
+          this.prefetch(cleanPath);
         }
       }, { passive: true });
 
@@ -257,10 +287,10 @@ document.addEventListener("DOMContentLoaded", () => {
     },
 
     getActiveNavLink() {
-      const currentPath = window.location.pathname.split("/").pop() || "index.html";
+      const currentPath = normalizePagePath(window.location.pathname);
       return this.items.find((a) => {
-        const h = a.getAttribute("href");
-        return h === currentPath || (currentPath === "index.html" && (h === "./" || h === "index.html" || h === "/"));
+        const h = normalizePagePath(a.getAttribute("href"));
+        return h === currentPath;
       }) || this.navLinks.querySelector("a.active") || this.items[0];
     },
 
@@ -288,7 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
 
     async prefetch(url) {
-      const cleanUrl = url.split("#")[0].split("?")[0] || "index.html";
+      const cleanUrl = normalizePagePath(url);
       if (this.cache.has(cleanUrl)) return;
       try {
         const res = await fetch(cleanUrl);
@@ -301,13 +331,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async navigate(targetUrl, pushState = true) {
       const [pathWithParams, hash] = targetUrl.split("#");
-      const cleanPath = pathWithParams.split("?")[0] || "index.html";
-      const currentPath = window.location.pathname.split("/").pop() || "index.html";
+      const cleanPath = normalizePagePath(pathWithParams);
+      const currentPath = normalizePagePath(window.location.pathname);
 
-      // If on the exact same page with a hash, smooth scroll to it
+      // If on the exact same page with a hash, smooth scroll or open modal
       if (cleanPath === currentPath && hash) {
-        const el = document.getElementById(hash);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (hash.startsWith("exp-")) {
+          const expId = hash.replace("exp-", "");
+          if (typeof ExperienceModalController !== "undefined" && typeof EXPERIENCES_BY_ID !== "undefined" && EXPERIENCES_BY_ID[expId]) {
+            setTimeout(() => ExperienceModalController.open(expId), 150);
+          }
+        } else {
+          const el = document.getElementById(hash);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
         if (pushState) window.history.pushState(null, "", targetUrl);
         return;
       }
@@ -327,22 +364,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Update active nav link & slide pill indicator immediately
-      const targetNav = this.items.find((a) => {
-        const h = a.getAttribute("href");
-        return h === cleanPath || (cleanPath === "index.html" && (h === "./" || h === "index.html"));
+      this.items.forEach((a) => {
+        const h = normalizePagePath(a.getAttribute("href"));
+        const isTarget = h === cleanPath;
+        a.classList.toggle("active", isTarget);
+        if (isTarget) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
       });
-      if (targetNav) {
-        this.items.forEach((a) => {
-          const isTarget = a === targetNav;
-          a.classList.toggle("active", isTarget);
-          if (isTarget) a.setAttribute("aria-current", "page");
-          else a.removeAttribute("aria-current");
-        });
-        this.mobileNavLinks.forEach((a) => {
-          const h = a.getAttribute("href");
-          a.classList.toggle("active", h === cleanPath || (cleanPath === "index.html" && h === "index.html"));
-        });
-        this.positionIndicator(targetNav, true);
+      this.mobileNavLinks.forEach((a) => {
+        const h = normalizePagePath(a.getAttribute("href"));
+        a.classList.toggle("active", h === cleanPath);
+      });
+      const activeLink = this.getActiveNavLink();
+      if (activeLink) {
+        this.positionIndicator(activeLink, true);
       }
 
       const main = document.getElementById("main");
@@ -378,6 +413,24 @@ document.addEventListener("DOMContentLoaded", () => {
           main.className = newMain.className;
         }
 
+        // Update body classes & id
+        if (doc.body) {
+          document.body.className = doc.body.className || "";
+          if (doc.body.id) {
+            document.body.id = doc.body.id;
+          } else {
+            document.body.removeAttribute("id");
+          }
+        }
+
+        // Ensure modals are in DOM if new page has them
+        ["expModal", "categoryDrawer", "lightbox"].forEach((id) => {
+          if (!document.getElementById(id)) {
+            const el = doc.getElementById(id);
+            if (el) document.body.appendChild(el.cloneNode(true));
+          }
+        });
+
         // Update document title
         if (doc.title) {
           document.title = doc.title;
@@ -390,9 +443,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Scroll to top (or to hash target if provided)
         if (hash) {
-          const targetEl = document.getElementById(hash);
-          if (targetEl) targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-          else window.scrollTo({ top: 0, behavior: "instant" });
+          if (hash.startsWith("exp-")) {
+            const expId = hash.replace("exp-", "");
+            if (typeof ExperienceModalController !== "undefined" && typeof EXPERIENCES_BY_ID !== "undefined" && EXPERIENCES_BY_ID[expId]) {
+              setTimeout(() => ExperienceModalController.open(expId), 150);
+            }
+          } else {
+            const targetEl = document.getElementById(hash);
+            if (targetEl) targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            else window.scrollTo({ top: 0, behavior: "instant" });
+          }
         } else {
           window.scrollTo({ top: 0, behavior: "instant" });
         }
@@ -1177,19 +1237,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const ExperienceModalController = {
-    modal: $("expModal"),
-    dialog: $("expModal") ? $("expModal").querySelector(".exp-modal-dialog") : null,
-    body: $("expModalBody"),
-    counter: $("expModalCounter"),
-    prevBtn: $("expModalPrevBtn"),
-    nextBtn: $("expModalNextBtn"),
-    closeBtn: $("expModalCloseBtn"),
+    modal: null,
+    dialog: null,
+    body: null,
+    counter: null,
+    prevBtn: null,
+    nextBtn: null,
+    closeBtn: null,
     currentIndex: 0,
     activeList: EXPERIENCES,
     lastOpener: null,
+    _bound: false,
 
     init() {
+      this.modal = $("expModal");
+      this.dialog = this.modal ? this.modal.querySelector(".exp-modal-dialog") : null;
+      this.body = $("expModalBody");
+      this.counter = $("expModalCounter");
+      this.prevBtn = $("expModalPrevBtn");
+      this.nextBtn = $("expModalNextBtn");
+      this.closeBtn = $("expModalCloseBtn");
+
       if (!this.modal) return;
+      if (this._bound) return;
+      this._bound = true;
+
       if (this.closeBtn) this.closeBtn.addEventListener("click", () => this.close());
       if (this.prevBtn) this.prevBtn.addEventListener("click", () => this.prev());
       if (this.nextBtn) this.nextBtn.addEventListener("click", () => this.next());
@@ -1199,40 +1271,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (this.body) {
         this.body.addEventListener("click", (e) => {
-        const enq = e.target.closest("[data-enquire]");
-        if (enq) {
-          const expId = enq.getAttribute("data-enquire");
-          this.close(false);
-          UnifiedEnquiryController.openModal("enquiry", expId, enq);
-          return;
-        }
-
-        const ask = e.target.closest("[data-ask]");
-        if (ask) {
-          const exp = EXPERIENCES_BY_ID[ask.getAttribute("data-ask")];
-          this.close(false);
-          opensomaPanel();
-          sendSomaMessage(`Tell me about the ${exp.name}`);
-          return;
-        }
-
-        const shot = e.target.closest(".shot-btn");
-        if (shot) {
-          openLightbox(shot.getAttribute("data-exp"), +shot.getAttribute("data-i"), shot);
-          return;
-        }
-
-        const gPrev = e.target.closest(".g-prev");
-        const gNext = e.target.closest(".g-next");
-        if (gPrev || gNext) {
-          const gallery = e.target.closest(".gallery");
-          const track = gallery ? gallery.querySelector(".gallery-track") : null;
-          if (track) {
-            const shift = track.clientWidth * 0.8;
-            track.scrollBy({ left: gPrev ? -shift : shift, behavior: "smooth" });
+          const enq = e.target.closest("[data-enquire]");
+          if (enq) {
+            const expId = enq.getAttribute("data-enquire");
+            this.close(false);
+            UnifiedEnquiryController.openModal("enquiry", expId, enq);
+            return;
           }
-        }
-      });
+
+          const ask = e.target.closest("[data-ask]");
+          if (ask) {
+            const exp = EXPERIENCES_BY_ID[ask.getAttribute("data-ask")];
+            this.close(false);
+            openSomaPanel();
+            if (exp) {
+              sendSomaMessage(`Tell me about the ${exp.name || exp.title}`);
+            }
+            return;
+          }
+
+          const shot = e.target.closest(".shot-btn");
+          if (shot) {
+            openLightbox(shot.getAttribute("data-exp"), +shot.getAttribute("data-i"), shot);
+            return;
+          }
+
+          const gPrev = e.target.closest(".g-prev");
+          const gNext = e.target.closest(".g-next");
+          if (gPrev || gNext) {
+            const gallery = e.target.closest(".gallery");
+            const track = gallery ? gallery.querySelector(".gallery-track") : null;
+            if (track) {
+              const shift = track.clientWidth * 0.8;
+              track.scrollBy({ left: gPrev ? -shift : shift, behavior: "smooth" });
+            }
+          }
+        });
       }
 
       document.addEventListener("keydown", (e) => {
@@ -1253,6 +1327,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
 
     open(expId, opener = null) {
+      if (!this.modal) this.init();
+      if (!this.modal) return;
       this.activeList = EXPERIENCES;
       const idx = this.activeList.findIndex((x) => x.id === expId);
       this.currentIndex = idx >= 0 ? idx : 0;
@@ -1263,20 +1339,20 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
       try { history.replaceState(null, "", `#exp-${this.activeList[this.currentIndex].id}`); } catch (err) {}
-      this.closeBtn.focus();
+      if (this.closeBtn) this.closeBtn.focus();
     },
 
     render() {
       const exp = this.activeList[this.currentIndex];
-      if (!exp) return;
+      if (!exp || !this.body) return;
       this.body.innerHTML = createShowcaseMarkup(exp);
       const total = this.activeList.length;
       const curNum = String(this.currentIndex + 1).padStart(2, "0");
-      this.counter.textContent = `${curNum} / ${total}`;
+      if (this.counter) this.counter.textContent = `${curNum} / ${total}`;
       const prevExp = this.activeList[(this.currentIndex - 1 + total) % total];
       const nextExp = this.activeList[(this.currentIndex + 1) % total];
-      this.prevBtn.title = `Previous: ${prevExp.name}`;
-      this.nextBtn.title = `Next: ${nextExp.name}`;
+      if (this.prevBtn && prevExp) this.prevBtn.title = `Previous: ${prevExp.name || prevExp.title}`;
+      if (this.nextBtn && nextExp) this.nextBtn.title = `Next: ${nextExp.name || nextExp.title}`;
       if (this.dialog) this.dialog.scrollTop = 0;
       if (this.body) this.body.scrollTop = 0;
       try { history.replaceState(null, "", `#exp-${exp.id}`); } catch (err) {}
@@ -1398,7 +1474,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return `
           <article class="exp-card" data-id="${exp.id}" data-category="${esc(exp.category)}" tabindex="0" role="button" aria-label="View details for ${esc(exp.title)}">
             <div class="exp-card-media">
-              <img class="exp-card-media-bg" src="${coverWebp}" alt="" aria-hidden="true" width="400" height="280" loading="lazy" decoding="async" onerror="this.src='${coverImg}'">
+              <img class="exp-card-media-bg" src="${coverWebp}" alt="" aria-hidden="true" width="400" height="280" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${coverImg}'">
               <picture>
                 <source srcset="${coverWebp}" type="image/webp">
                 <img class="exp-card-media-main" src="${coverImg}" alt="${esc(exp.title)}" width="400" height="280" loading="lazy" decoding="async">
@@ -1867,32 +1943,57 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gridEl) ExperienceGridController.render();
   }
 
-  initExperiencesPage();
-
-  if ($("expModal")) {
-    ExperienceModalController.init();
-  }
+  ExperienceModalController.init();
 
   /* ================================================================
      8. LIGHTBOX PHOTO VIEWER
      ================================================================ */
-  const lb = $("lightbox"), lbImg = $("lbImg"), lbCap = $("lbCap");
-  const lbPrev = $("lbPrev"), lbNext = $("lbNext"), lbClose = $("lbClose");
+  let lb = null, lbImg = null, lbCap = null;
+  let lbPrev = null, lbNext = null, lbClose = null;
   let lbExp = null, lbIdx = 0, lbOpener = null;
 
+  function initLightbox() {
+    lb = $("lightbox");
+    lbImg = $("lbImg");
+    lbCap = $("lbCap");
+    lbPrev = $("lbPrev");
+    lbNext = $("lbNext");
+    lbClose = $("lbClose");
+
+    if (lb && lbClose && !lb._bound) {
+      lb._bound = true;
+      lbClose.addEventListener("click", closeLightbox);
+      if (lbPrev) lbPrev.addEventListener("click", () => stepLb(-1));
+      if (lbNext) lbNext.addEventListener("click", () => stepLb(1));
+      lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
+
+      document.addEventListener("keydown", (e) => {
+        if (!lb || lb.hidden) return;
+        if (e.key === "Escape") closeLightbox();
+        else if (e.key === "ArrowLeft" && lbExp && lbExp.images.length > 1) stepLb(-1);
+        else if (e.key === "ArrowRight" && lbExp && lbExp.images.length > 1) stepLb(1);
+      });
+    }
+  }
+
   function showLightbox() {
+    if (!lb) initLightbox();
     if (!lb || !lbExp) return;
     const n = lbExp.images.length;
     const orig = lbExp.images[lbIdx];
     const webp = orig.replace(/\.(jpe?g|png)$/i, ".webp");
     lbImg.src = webp;
-    lbImg.onerror = () => { lbImg.src = orig; };
+    lbImg.onerror = () => {
+      lbImg.onerror = null;
+      lbImg.src = orig;
+    };
     lbImg.alt = `${lbExp.title} — photo ${lbIdx + 1} of ${n}`;
     lbCap.textContent = n > 1 ? `${lbExp.title} — ${lbIdx + 1} / ${n}` : lbExp.title;
     lbPrev.hidden = lbNext.hidden = n < 2;
   }
 
   function openLightbox(id, i, opener) {
+    if (!lb) initLightbox();
     if (!lb) return;
     lbExp = EXPERIENCES_BY_ID[id];
     lbIdx = i;
@@ -1914,7 +2015,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = "";
       document.body.classList.remove("modal-open");
     }
-    if (lbOpener) lbOpener.focus();
+    if (lbOpener && typeof lbOpener.focus === "function") lbOpener.focus();
   }
 
   const stepLb = (d) => {
@@ -1923,19 +2024,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showLightbox();
   };
 
-  if (lb && lbClose) {
-    lbClose.addEventListener("click", closeLightbox);
-    if (lbPrev) lbPrev.addEventListener("click", () => stepLb(-1));
-    if (lbNext) lbNext.addEventListener("click", () => stepLb(1));
-    lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
-
-    document.addEventListener("keydown", (e) => {
-      if (lb.hidden) return;
-      if (e.key === "Escape") closeLightbox();
-      else if (e.key === "ArrowLeft" && lbExp && lbExp.images.length > 1) stepLb(-1);
-      else if (e.key === "ArrowRight" && lbExp && lbExp.images.length > 1) stepLb(1);
-    });
-  }
+  initLightbox();
 
   /* ================================================================
      9. SOMA ACTION LAYER (Exposed to AI Agent)
@@ -2460,13 +2549,25 @@ document.addEventListener("DOMContentLoaded", () => {
     return { open, close, speakReply, switchToChat };
   })();
 
-  if (heroVoiceBtn) heroVoiceBtn.addEventListener("click", VoiceUIController.open);
-  document.querySelectorAll(".hero-chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
+  // Delegated click handler for hero prompt chips and voice CTA (persists across client-side page transitions)
+  document.addEventListener("click", (e) => {
+    const chip = e.target.closest(".hero-chip");
+    if (chip) {
       const prompt = chip.getAttribute("data-soma-prompt");
-      openSomaPanel();
-      sendSomaMessage(prompt);
-    });
+      if (prompt) {
+        openSomaPanel();
+        sendSomaMessage(prompt);
+      }
+      return;
+    }
+
+    const voiceBtn = e.target.closest("#heroVoiceBtn, .hero-voice-cta");
+    if (voiceBtn) {
+      if (typeof VoiceUIController !== "undefined" && VoiceUIController.open) {
+        VoiceUIController.open();
+      }
+      return;
+    }
   });
   if (somaMicBtn) {
     somaMicBtn.addEventListener("click", () => {
