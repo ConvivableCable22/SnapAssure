@@ -107,7 +107,16 @@ const SomaMemory = {
 // A real backend mirrors this same idea server-side, in
 // backend/lib/context.js, before calling the AI provider.
 // ------------------------------------------------------------
-var EXPERIENCES = (typeof EXPERIENCES !== "undefined" ? EXPERIENCES : (typeof window !== "undefined" && window.EXPERIENCES ? window.EXPERIENCES : (typeof global !== "undefined" && global.EXPERIENCES ? global.EXPERIENCES : [])));
+function getExperiencesCatalog() {
+  if (typeof window !== "undefined" && window.EXPERIENCES) return window.EXPERIENCES;
+  if (typeof EXPERIENCES !== "undefined") return EXPERIENCES;
+  if (typeof global !== "undefined" && global.EXPERIENCES) return global.EXPERIENCES;
+  try {
+    return require("./experiences-data.js").EXPERIENCES || [];
+  } catch (e) {
+    return [];
+  }
+}
 
 function retrieveExperiences(query, { limit = 6 } = {}) {
   const STOP_WORDS = new Set(["hi", "hello", "hey", "the", "a", "an", "is", "in", "it", "to", "for", "of", "and", "or", "me", "my", "we", "our", "you", "your", "can", "show", "what", "find", "get", "do", "how", "tell"]);
@@ -115,7 +124,8 @@ function retrieveExperiences(query, { limit = 6 } = {}) {
   const words = rawWords.filter(w => !STOP_WORDS.has(w) && (w.length >= 3 || ["ai", "3d", "xr", "ar", "vr"].includes(w)));
   if (!words.length) return [];
 
-  const scored = EXPERIENCES.map(exp => {
+  const catalog = getExperiencesCatalog();
+  const scored = catalog.map(exp => {
     let score = 0;
     const haystack = [
       exp.name, exp.category, exp.tagline, exp.description,
@@ -149,18 +159,19 @@ function normalizeName(s) {
 
 function findExperienceByName(text) {
   const q = text.toLowerCase();
+  const catalog = getExperiencesCatalog();
 
   // 1) exact full-name / id substring match
-  let match = EXPERIENCES.find(e => q.includes(e.name.toLowerCase()));
+  let match = catalog.find(e => q.includes(e.name.toLowerCase()));
   if (match) return match;
-  match = EXPERIENCES.find(e => q.includes(e.id.replace(/-/g, " ")));
+  match = catalog.find(e => q.includes(e.id.replace(/-/g, " ")));
   if (match) return match;
 
   // 2) fuzzy "core words" match — e.g. "open the magic mirror" still
   // resolves to "Magic Mirror Photobooth" once generic suffixes are stripped
   const qWords = new Set(normalizeName(q).split(" ").filter(Boolean));
   let best = null, bestHits = 0;
-  EXPERIENCES.forEach(exp => {
+  catalog.forEach(exp => {
     const coreWords = normalizeName(exp.name).split(" ").filter(Boolean);
     if (!coreWords.length) return;
     const hits = coreWords.filter(w => qWords.has(w)).length;
@@ -597,11 +608,12 @@ function mockAI(userText, memory) {
 
   // 9. "what photobooths do you have" / general listing
   if (/what (photobooths?|experiences?|booths?) do you have|show me (all )?(your )?(experiences?|booths?|catalogue)/.test(q)) {
-    const sample = EXPERIENCES.slice(0, 6).map(e => e.name).join(", ");
+    const catalog = getExperiencesCatalog();
+    const sample = catalog.slice(0, 6).map(e => e.name).join(", ");
     return {
       reply: `We have a wide range of experiences including ${sample} and many more. Want me to narrow it down by event type or category?`,
       action: null,
-      relatedIds: EXPERIENCES.slice(0, 6).map(e => e.id)
+      relatedIds: catalog.slice(0, 6).map(e => e.id)
     };
   }
 
@@ -641,7 +653,7 @@ function mockAI(userText, memory) {
 
   // 12. Corporate + large guest count
   if (/corporate/.test(q) && guestsMatch) {
-    const matches = EXPERIENCES.filter(e => e.suitableFor.some(s => /corporate/i.test(s))).slice(0, 5);
+    const matches = getExperiencesCatalog().filter(e => e.suitableFor && e.suitableFor.some(s => /corporate/i.test(s))).slice(0, 5);
     return {
       reply: `For a corporate event with ${guestsMatch[1]} people, the catalogue lists these as suited to corporate events: ${matches.map(e => e.name).join(", ")}. Want me to filter the catalogue to these?`,
       action: { type: "FILTER_EXPERIENCES", category: "Photobooths" },
@@ -669,6 +681,8 @@ function mockAI(userText, memory) {
 // with useRealBackend: false it calls mockAI() locally, so the
 // whole app works with zero server setup out of the box.
 // ------------------------------------------------------------
+let localBackendOfflineUntil = 0;
+
 async function callAIBackend(message, memory) {
   const cfg = (typeof window !== "undefined" && window.SOMA_CONFIG) || (typeof SOMA_CONFIG !== "undefined" ? SOMA_CONFIG : { useRealBackend: false, backendUrl: "/api/chat" });
   memory = memory || (typeof SomaMemory !== "undefined" ? SomaMemory : {});
@@ -679,13 +693,13 @@ async function callAIBackend(message, memory) {
   const isHttpLocalhost = typeof cfg.backendUrl === "string" && cfg.backendUrl.startsWith("http://localhost");
 
   // Prevent browser Mixed Content security blocking (HTTPS page calling http://localhost)
-  const shouldSkipBackend = isHttps && isHttpLocalhost;
+  const shouldSkipBackend = (isHttps && isHttpLocalhost) || (isHttpLocalhost && Date.now() < localBackendOfflineUntil);
 
   if (cfg.useRealBackend && !shouldSkipBackend && cfg.backendUrl) {
     try {
       const controller = new AbortController();
-      // Fast 5000ms timeout prevents user waiting on frozen screen if serverless is cold or offline
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutMs = isHttpLocalhost ? 2500 : 6000;
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
       const res = await fetch(cfg.backendUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -704,7 +718,13 @@ async function callAIBackend(message, memory) {
         }
       }
       console.warn("[SOMA] Backend returned status " + res.status + ", falling back to built-in knowledge.");
+      if (isHttpLocalhost && res.status >= 500) {
+        localBackendOfflineUntil = Date.now() + 15000;
+      }
     } catch (err) {
+      if (isHttpLocalhost) {
+        localBackendOfflineUntil = Date.now() + 15000;
+      }
       console.warn("[SOMA] Backend unreachable (" + err.message + "). Falling back to local assistant.");
     }
   }

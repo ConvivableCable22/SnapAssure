@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 
 <head>
   <meta charset="UTF-8">
@@ -7,7 +7,7 @@
   <title>Interactive Experiences Catalogue | SnapAssure Interactive Booth</title>
   <meta name="description"
     content="Browse all 44 cutting-edge photobooths, AI activations, 360 video experiences, and luxury keepsakes by SnapAssure for high-profile weddings and corporate galas.">
-  <meta name="theme-color" content="#041418">
+  <meta name="theme-color" content="#3e9ba5">
 
   <!-- Open Graph -->
   <meta property="og:title" content="Interactive Experiences Catalogue | SnapAssure">
@@ -15,6 +15,24 @@
     content="Explore our curated collection of 44 premium interactive event technologies.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/logos/snapassure-logo.png">
+
+  <script>
+    /* Immediate theme detection to prevent FOUC (Flash of Unstyled Content) */
+    (function () {
+      try {
+        const savedTheme = localStorage.getItem('snapassure_theme');
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+          document.documentElement.setAttribute('data-theme', savedTheme);
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 
   <link rel="icon" type="image/png" href="assets/logos/snapassure-logo.png">
   <link rel="preload" as="image" href="assets/logos/snapassure-logo.png" type="image/png" fetchpriority="high">
@@ -133,6 +151,7 @@
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
             </span>
+            <span id="mobileThemeStatusText" class="theme-status-text">Light Mode</span>
           </button>
         </div>
       </div>

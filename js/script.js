@@ -79,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function toggleMobileMenu(forceClose = false) {
     const shouldOpen = forceClose ? false : !mobileMenu.classList.contains("open");
     mobileMenu.classList.toggle("open", shouldOpen);
+    mobileMenu.setAttribute("aria-hidden", shouldOpen ? "false" : "true");
     hamburgerBtn.classList.toggle("open", shouldOpen);
     hamburgerBtn.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
     document.body.classList.toggle("menu-open", shouldOpen);
@@ -89,6 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     mobileMenu.querySelectorAll("a").forEach((a) => {
       a.addEventListener("click", () => toggleMobileMenu(true));
+    });
+
+    mobileMenu.addEventListener("click", (e) => {
+      if (e.target === mobileMenu) toggleMobileMenu(true);
     });
 
     // Close mobile menu on Escape key
@@ -173,12 +178,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (e) {}
     clean = clean.replace(/^\/+|\/+$/g, "");
-    clean = clean.split("/").pop() || "index.html";
-    if (!clean || clean === "." || clean === "index") return "index.html";
-    if (clean === "experiences") return "experiences.html";
-    if (clean === "clients") return "clients.html";
-    if (!clean.endsWith(".html")) clean += ".html";
-    return clean.toLowerCase();
+    const lastPart = clean.split("/").pop() || "";
+    const base = lastPart.toLowerCase().replace(/\.html$/, "");
+    if (base === "experiences") return "experiences.html";
+    if (base === "clients") return "clients.html";
+    return "index.html";
   }
 
   function reinitPageFeatures() {
@@ -204,8 +208,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const SmoothNavigationController = {
     cache: new Map(),
     isTransitioning: false,
+    currentLoadedPage: null,
 
     init() {
+      this.currentLoadedPage = normalizePagePath(window.location.pathname);
       this.navLinks = document.querySelector(".nav-links");
       if (!this.navLinks) return;
 
@@ -223,6 +229,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const activeLink = this.getActiveNavLink();
       if (activeLink) {
         this.positionIndicator(activeLink, false);
+      }
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          const current = this.getActiveNavLink();
+          if (current) this.positionIndicator(current, false);
+        });
       }
 
       let resizeRaf = null;
@@ -287,7 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
 
     getActiveNavLink() {
-      const currentPath = normalizePagePath(window.location.pathname);
+      const currentPath = this.currentLoadedPage || normalizePagePath(window.location.pathname);
       return this.items.find((a) => {
         const h = normalizePagePath(a.getAttribute("href"));
         return h === currentPath;
@@ -332,10 +345,10 @@ document.addEventListener("DOMContentLoaded", () => {
     async navigate(targetUrl, pushState = true) {
       const [pathWithParams, hash] = targetUrl.split("#");
       const cleanPath = normalizePagePath(pathWithParams);
-      const currentPath = normalizePagePath(window.location.pathname);
+      const isCurrentPage = cleanPath === this.currentLoadedPage;
 
       // If on the exact same page with a hash, smooth scroll or open modal
-      if (cleanPath === currentPath && hash) {
+      if (isCurrentPage && hash) {
         if (hash.startsWith("exp-")) {
           const expId = hash.replace("exp-", "");
           if (typeof ExperienceModalController !== "undefined" && typeof EXPERIENCES_BY_ID !== "undefined" && EXPERIENCES_BY_ID[expId]) {
@@ -350,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // If on the exact same page without a hash, smooth scroll to top
-      if (cleanPath === currentPath && !hash) {
+      if (isCurrentPage && !hash) {
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
@@ -412,6 +425,7 @@ document.addEventListener("DOMContentLoaded", () => {
           main.innerHTML = newMain.innerHTML;
           main.className = newMain.className;
         }
+        this.currentLoadedPage = cleanPath;
 
         // Update body classes & id
         if (doc.body) {
@@ -521,7 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
     inpageTabQuote: $("tabQuote"),
     inpageSubmitBtn: $("inpageSubmitBtn"),
     inpageSubmitText: $("inpageSubmitText"),
-    inpageWaBtn: $("waBtn"),
+    inpageWaBtn: $("inpageWaBtn") || $("waBtn"),
     inpageClearBtn: $("inpageClearBtn"),
     inpageFormError: $("inpageFormError"),
     inpageSuccessView: $("inpageSuccessView"),
@@ -536,7 +550,7 @@ document.addEventListener("DOMContentLoaded", () => {
       this.inpageTabQuote = $("tabQuote");
       this.inpageSubmitBtn = $("inpageSubmitBtn");
       this.inpageSubmitText = $("inpageSubmitText");
-      this.inpageWaBtn = $("waBtn");
+      this.inpageWaBtn = $("inpageWaBtn") || $("waBtn");
       this.inpageClearBtn = $("inpageClearBtn");
       this.inpageFormError = $("inpageFormError");
       this.inpageSuccessView = $("inpageSuccessView");
@@ -613,13 +627,13 @@ document.addEventListener("DOMContentLoaded", () => {
       // Modal open triggers via event delegation on document (works across all pages & content swaps)
       document.addEventListener("click", (e) => {
         const quoteBtn = e.target.closest('[data-mode="quote"]');
-        if (quoteBtn) {
+        if (quoteBtn && !quoteBtn.closest('.modal-tabs') && !quoteBtn.closest('.form-tabs')) {
           e.preventDefault();
           this.openModal("quote", quoteBtn.getAttribute("data-enquire") || "", quoteBtn);
           return;
         }
         const enqBtn = e.target.closest('[data-mode="enquiry"]');
-        if (enqBtn) {
+        if (enqBtn && !enqBtn.closest('.modal-tabs') && !enqBtn.closest('.form-tabs')) {
           e.preventDefault();
           this.openModal("enquiry", enqBtn.getAttribute("data-enquire") || "", enqBtn);
           return;
@@ -1657,6 +1671,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!gridEl) return;
 
     if (chipsWrap && chipsWrap.children.length === 0) {
+      state.category = "All";
+      state.query = "";
+      state.visibleCount = INITIAL_BATCH;
       try {
         const params = new URLSearchParams(window.location.search);
         const urlQ = params.get("q");
@@ -2047,6 +2064,8 @@ document.addEventListener("DOMContentLoaded", () => {
       syncChips();
       ExperienceGridController.render();
       scrollToSection("experiences");
+    } else if (typeof SmoothNavigationController !== "undefined" && SmoothNavigationController.navigate) {
+      SmoothNavigationController.navigate(`experiences.html?cat=${encodeURIComponent(category)}`);
     } else {
       window.location.href = `experiences.html?cat=${encodeURIComponent(category)}`;
     }
@@ -2062,6 +2081,8 @@ document.addEventListener("DOMContentLoaded", () => {
       syncChips();
       ExperienceGridController.render();
       scrollToSection("experiences");
+    } else if (typeof SmoothNavigationController !== "undefined" && SmoothNavigationController.navigate) {
+      SmoothNavigationController.navigate(`experiences.html?q=${encodeURIComponent(query)}`);
     } else {
       window.location.href = `experiences.html?q=${encodeURIComponent(query)}`;
     }
@@ -2115,8 +2136,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const somaStatusBadge = $("somaStatusBadge");
   const somaStatusText = $("somaStatusText");
 
-  if (typeof SomaMemory !== "undefined" && SomaMemory.load) {
-    SomaMemory.load();
+  const initialMem = (typeof window !== "undefined" && window.SomaMemory) || (typeof SomaMemory !== "undefined" ? SomaMemory : null);
+  if (initialMem && initialMem.load) {
+    initialMem.load();
   }
 
   function setSomaState(stateName) {
@@ -2328,22 +2350,28 @@ document.addEventListener("DOMContentLoaded", () => {
   async function sendSomaMessage(text, { fromVoice = false } = {}) {
     if (!text || !text.trim()) return;
     appendMessage("user", text);
-    SomaMemory.push("user", text);
+    const mem = (typeof window !== "undefined" && window.SomaMemory) || (typeof SomaMemory !== "undefined" ? SomaMemory : null);
+    if (mem && mem.push) mem.push("user", text);
     showTyping();
     setSomaState("thinking");
 
     try {
-      const { reply, action } = await callAIBackend(text, SomaMemory);
+      const caller = (typeof window !== "undefined" && window.callAIBackend) || (typeof callAIBackend !== "undefined" ? callAIBackend : null);
+      if (!caller) throw new Error("AI Assistant engine not loaded");
+      const { reply, action } = await caller(text, mem);
       hideTyping();
 
       const isBoothRelated = Boolean(action?.experienceId || action?.category || /\b(booth|photobooth|photo|video|glambot|roamer|camera|print|prints|wedding|party|corporate|activation|experience|snapassure|package|quote)\b/i.test(text + " " + reply));
-      const related = isBoothRelated
-        ? retrieveExperiences(text, { limit: 4 }).map((e) => e.id)
+      const retriever = (typeof window !== "undefined" && window.retrieveExperiences) || (typeof retrieveExperiences !== "undefined" ? retrieveExperiences : null);
+      const related = isBoothRelated && retriever
+        ? retriever(text, { limit: 4 }).map((e) => e.id)
         : [];
       appendMessage("soma", reply, related);
-      SomaMemory.push("soma", reply);
+      if (mem && mem.push) mem.push("soma", reply);
 
-      executeSomaAction(action);
+      if (typeof executeSomaAction === "function") {
+        executeSomaAction(action);
+      }
 
       // If AI wants to switch user to chat (e.g. user asked "go to chat")
       if (action?.type === "switchToChat") {
