@@ -1819,8 +1819,15 @@ body.experiences-page .toolbar-wrap {
   transform: translateY(-50%) scale(1.15);
 }
 
-.search-box.has-value .clear-btn {
+.clear-btn svg {
   display: block;
+  pointer-events: none;
+}
+
+.search-box.has-value .clear-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .search-mic-btn {
@@ -2351,11 +2358,23 @@ body.experiences-page .toolbar-wrap {
 
 .category-sheet-close-btn {
   position: static;
+  top: auto;
+  right: auto;
   width: 36px;
   height: 36px;
   min-width: 36px;
   min-height: 36px;
   font-size: 0.95rem;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.category-sheet-close-btn svg {
+  display: block;
+  pointer-events: none;
   flex-shrink: 0;
 }
 
@@ -2856,7 +2875,11 @@ body.modal-open {
 .exp-modal-topbar .modal-close-btn,
 #expModalCloseBtn {
   position: relative !important;
-  margin-left: auto;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  margin: 0 0 0 auto;
   width: 32px;
   height: 32px;
   min-width: 32px;
@@ -2875,6 +2898,13 @@ body.modal-open {
   transition: all 0.2s var(--ease-smooth);
   line-height: 1;
   box-sizing: border-box;
+}
+
+.exp-modal-topbar .modal-close-btn svg,
+#expModalCloseBtn svg {
+  display: block;
+  pointer-events: none;
+  flex-shrink: 0;
 }
 
 .exp-modal-topbar .modal-close-btn::before,
@@ -4062,6 +4092,12 @@ body.modal-open {
   font-size: 1.1rem;
 }
 
+.lb-btn svg {
+  display: block;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
 .lb-close:hover {
   border-color: var(--gold);
   color: var(--gold);
@@ -4975,12 +5011,20 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   color: var(--text-primary);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
+  padding: 0;
   cursor: pointer;
   transition: all 0.18s ease;
+  box-sizing: border-box;
+}
+
+.modal-close-btn svg {
+  display: block;
+  pointer-events: none;
+  flex-shrink: 0;
 }
 
 .modal-close-btn:hover {
@@ -5979,12 +6023,20 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 1.25rem;
+  padding: 0;
   transition: all 0.2s var(--ease-smooth);
+  box-sizing: border-box;
+}
+
+.voice-close svg {
+  display: block;
+  pointer-events: none;
+  flex-shrink: 0;
 }
 
 .voice-close:hover {
@@ -6660,12 +6712,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   }
   .exp-modal-topbar .modal-close-btn,
   #expModalCloseBtn {
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
     width: 28px;
     height: 28px;
     min-width: 28px;
     min-height: 28px;
     padding: 0;
-    font-size: 0.72rem;
   }
   .exp-modal-body {
     padding: 6px 8px 8px;
